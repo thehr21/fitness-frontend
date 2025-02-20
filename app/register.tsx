@@ -63,7 +63,7 @@ export default function Register() {
 
     // ✅ If all validations pass, proceed
     router.push({
-      pathname: "/register1",
+      pathname: "/register0",
       params: { fullName, username, email, password },
     });
   };

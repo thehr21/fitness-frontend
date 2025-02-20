@@ -15,6 +15,7 @@ export default function RegisterStep3() {
       username: params.username,
       email: params.email,
       password: params.password,
+      activity_level: params.activity_level,
       gender: params.gender,
       current_weight: parseFloat(Array.isArray(params.currentWeight) ? params.currentWeight[0] : params.currentWeight), // ✅ Convert to float
       target_weight: parseFloat(Array.isArray(params.targetWeight) ? params.targetWeight[0] : String(params.targetWeight)), // ✅ Convert to float
@@ -30,6 +31,7 @@ export default function RegisterStep3() {
           username: params.username,
           email: params.email,
           password: params.password,
+          activity_level: params.activity_level,
           gender: params.gender,
           current_weight: parseFloat(Array.isArray(params.currentWeight) ? params.currentWeight[0] : params.currentWeight), // ✅ Convert weight to float
           target_weight: parseFloat(Array.isArray(params.targetWeight) ? params.targetWeight[0] : params.targetWeight), // ✅ Convert weight to float

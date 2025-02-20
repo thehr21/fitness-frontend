@@ -32,6 +32,7 @@ export default function RootLayout() {
       {/* Welcome Screen loads first */}
       <Stack.Screen name="welcome" options={{ headerShown: false }} />
       <Stack.Screen name="register" options={{ headerShown: false }} />
+      <Stack.Screen name="register0" options={{ headerShown: false }} />
       <Stack.Screen name="register1" options={{ headerShown: false }} />
       <Stack.Screen name="register2" options={{ headerShown: false }} />
       <Stack.Screen name="login" options={{ headerShown: false }} />

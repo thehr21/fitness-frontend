@@ -32,6 +32,7 @@ export default function RegisterStep2() {
         username: params.username,
         email: params.email,
         password: params.password,
+        activity_level: params.activity_level,
         gender,
         currentWeight,
         targetWeight,
