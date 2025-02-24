@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login() {
   const router = useRouter();
@@ -30,8 +31,17 @@ export default function Login() {
       }
 
       console.log("✅ Login Successful:", data);
+
+      // ✅ Store token in AsyncStorage
+      await AsyncStorage.setItem("access_token", data.access_token);
+      console.log("🔑 Token Stored Successfully");
+
+      // ✅ Debug: Retrieve and log the stored token
+      const storedToken = await AsyncStorage.getItem("access_token");
+      console.log("🛠️ Token Retrieved After Storing:", storedToken);
+
       Alert.alert("Welcome!", "Login successful.");
-      router.push("/"); // 🚀 Navigate to home screen (app/tabs/index.tsx)
+      router.push("/"); // 🚀 Navigate to home screen
     } catch (error) {
       if (error instanceof Error) {
         console.log("❌ Login Failed:", error.message);
@@ -120,4 +130,5 @@ const styles = StyleSheet.create({
   buttonText: { fontSize: 18, fontWeight: "bold", color: "#fff" },
   linkText: { marginTop: 15, color: "#4CAF50", textDecorationLine: "underline" },
 });
+
 

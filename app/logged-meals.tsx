@@ -1,11 +1,40 @@
 import { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router"; // ✅ Import router for navigation
+import { useRouter } from "expo-router";
+import { jwtDecode } from "jwt-decode";  // ✅ Correct import
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20, backgroundColor: "#FFF3E0" },
+  title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 10 },
+  card: { backgroundColor: "#fff", padding: 15, borderRadius: 10, marginBottom: 10, elevation: 2 },
+  mealName: { fontSize: 18, fontWeight: "bold" },
+  errorText: { fontSize: 16, color: "red", textAlign: "center", marginTop: 10 },
+  button: { marginTop: 20, padding: 15, borderRadius: 8, backgroundColor: "#4CAF50", alignItems: "center" },
+  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+});
+
+const getUserIdFromToken = async () => {
+  try {
+    const token = await AsyncStorage.getItem("access_token");
+    if (!token) {
+      console.error("⚠️ No token found");
+      return null;
+    }
+
+    const decodedToken: any = jwtDecode(token);
+    console.log("🔑 Decoded Token:", decodedToken);
+    return decodedToken.sub;  // ✅ Correctly extracts user ID from the token
+  } catch (error) {
+    console.error("⚠️ Error decoding token:", error);
+    return null;
+  }
+};
 
 export default function LoggedMealsScreen() {
-  const router = useRouter(); // ✅ Router for back navigation
-
-  interface LoggedMeal {
+  const router = useRouter();
+  const [userId, setUserId] = useState<number | null>(null);
+  interface Meal {
     id: number;
     food_item: string;
     calories: number;
@@ -15,25 +44,33 @@ export default function LoggedMealsScreen() {
     timestamp: string;
   }
 
-  const [loggedMeals, setLoggedMeals] = useState<LoggedMeal[]>([]);
+  const [loggedMeals, setLoggedMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const userId = 1; // ⚡ Replace dynamically with logged-in user ID
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const id = await getUserIdFromToken();
+      setUserId(id);
+    };
+    fetchUserId();
+  }, []);
 
   useEffect(() => {
+    if (!userId) return; // ✅ Wait until userId is fetched before making API request
+
     const fetchLoggedMeals = async () => {
       try {
         setLoading(true);
         console.log(`📌 Fetching logged meals for user ${userId}...`);
-    
-        const response = await fetch(`http://192.168.0.229:8000/log-meals/${userId}`); // ✅ Fixed API call
-    
+
+        const response = await fetch(`http://192.168.0.229:8000/log-meals/${userId}`); // ✅ Uses correct user ID
+
         if (!response.ok) {
           const errorMessage = await response.text();
           throw new Error(`Failed to fetch logged meals: ${errorMessage}`);
         }
-    
+
         const data = await response.json();
         console.log("✅ Logged Meals Response:", data);
         setLoggedMeals(data);
@@ -44,10 +81,10 @@ export default function LoggedMealsScreen() {
         setLoading(false);
       }
     };
-    
+
     fetchLoggedMeals();
-  }, []);
-  
+  }, [userId]); // ✅ Fetches meals only when userId is available
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>📋 Logged Meals</Text>
@@ -73,20 +110,9 @@ export default function LoggedMealsScreen() {
         />
       )}
 
-      {/* ✅ Button to Go Back */}
       <TouchableOpacity style={styles.button} onPress={() => router.back()}>
         <Text style={styles.buttonText}>🔙 Go Back</Text>
       </TouchableOpacity>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#FFF3E0" },
-  title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 10 },
-  card: { backgroundColor: "#fff", padding: 15, borderRadius: 10, marginBottom: 10, elevation: 2 },
-  mealName: { fontSize: 18, fontWeight: "bold" },
-  errorText: { fontSize: 16, color: "red", textAlign: "center", marginTop: 10 },
-  button: { marginTop: 20, padding: 15, borderRadius: 8, backgroundColor: "#4CAF50", alignItems: "center" },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-});
