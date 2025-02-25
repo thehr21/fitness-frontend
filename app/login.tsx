@@ -32,24 +32,18 @@ export default function Login() {
 
       console.log("✅ Login Successful:", data);
 
-      // ✅ Store token in AsyncStorage
+      // ✅ Store user_id & activity_level in AsyncStorage
       await AsyncStorage.setItem("access_token", data.access_token);
-      console.log("🔑 Token Stored Successfully");
+      await AsyncStorage.setItem("user_id", data.user_id.toString()); // Convert user_id to string
+      await AsyncStorage.setItem("activity_level", data.activity_level);
 
-      // ✅ Debug: Retrieve and log the stored token
-      const storedToken = await AsyncStorage.getItem("access_token");
-      console.log("🛠️ Token Retrieved After Storing:", storedToken);
+      console.log("🔑 Token, User ID & Activity Level Stored Successfully");
 
       Alert.alert("Welcome!", "Login successful.");
       router.push("/"); // 🚀 Navigate to home screen
     } catch (error) {
-      if (error instanceof Error) {
-        console.log("❌ Login Failed:", error.message);
-      } else {
-        console.log("❌ Login Failed:", error);
-      }
-      const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred.";
-      Alert.alert("Login Failed", errorMessage);
+      console.error("❌ Login Failed:", error);
+      Alert.alert("Login Failed", (error as any).message || "An unexpected error occurred.");
     }
   };
 
@@ -130,5 +124,3 @@ const styles = StyleSheet.create({
   buttonText: { fontSize: 18, fontWeight: "bold", color: "#fff" },
   linkText: { marginTop: 15, color: "#4CAF50", textDecorationLine: "underline" },
 });
-
-

@@ -42,6 +42,7 @@ export default function RootLayout() {
       {/* Tabs load after Welcome */}
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="recipe" options={{ headerShown: true }} />  
+      <Stack.Screen name="LoggedExercisesScreen" options={{ headerShown: true, title: "Logged Exercises" }} />
     </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
