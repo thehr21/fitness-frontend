@@ -9,15 +9,15 @@ const getUserIdFromToken = async () => {
   try {
     const token = await AsyncStorage.getItem("access_token");
     if (!token) {
-      console.error("⚠️ No token found");
+      console.error("No token found");
       return null;
     }
 
     const decodedToken: any = jwtDecode(token);
-    console.log("🔑 Decoded Token:", decodedToken);
+    console.log(" Decoded Token:", decodedToken);
     return decodedToken.sub;
   } catch (error) {
-    console.error("⚠️ Error decoding token:", error);
+    console.error("Error decoding token:", error);
     return null;
   }
 };
@@ -63,7 +63,7 @@ export default function MealPlanningScreen() {
         console.log("🔍 User Goal Fetched:", data);
         setUserGoal(data.goal);
       } catch (error) {
-        console.error("⚠️ Failed to load user goal:", error);
+        console.error(" Failed to load user goal:", error);
         setError("Failed to load user goal");
       }
     };
@@ -83,26 +83,26 @@ export default function MealPlanningScreen() {
     
         const response = await fetch(`http://192.168.0.229:8000/meals/${userGoal}?refresh=true`);
         
-        const data = await response.json(); // ✅ Parse response JSON first
+        const data = await response.json(); // Parse response JSON first
     
-        if (response.status === 402) {  // ✅ Handle Spoonacular API limit reached
+        if (response.status === 402) {  // Handle Spoonacular API limit reached
           console.error("❌ Spoonacular API limit reached!");
           Alert.alert(
             "⚠️ API Limit Reached",
             "You’ve reached your daily meal request limit. Try again tomorrow."
           );
-          return; // ✅ Stop execution here
+          return; // Stop execution here
         }
     
         if (!response.ok) {
           throw new Error(data.detail || "Failed to fetch meals"); // ✅ Show API error message
         }
     
-        console.log("✅ Fetched Meals Data:", JSON.stringify(data, null, 2)); 
+        console.log(" Fetched Meals Data:", JSON.stringify(data, null, 2)); 
     
         setMeals(data);
       } catch (error) {
-        console.error("⚠️ Failed to load meals:", error);
+        console.error(" Failed to load meals:", error);
         setError(error instanceof Error ? error.message : "An unknown error occurred");
       } finally {
         setLoading(false);
@@ -116,7 +116,7 @@ export default function MealPlanningScreen() {
 
   const logMeal = async (meal: Meal) => {
     try {
-      console.log("📝 Logging meal:", meal);
+      console.log("Logging meal:", meal);
       const response = await fetch("http://192.168.0.229:8000/log-meals/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -161,7 +161,7 @@ export default function MealPlanningScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.subtitle}>🎯 Goal: {userGoal ? userGoal.replace("_", " ").toUpperCase() : "Loading..."}</Text>
+        <Text style={styles.subtitle}>GOAL: {userGoal ? userGoal.replace("_", " ").toUpperCase() : "Loading..."}</Text>
         <TouchableOpacity style={styles.button} onPress={refreshMeals}>
           <Text>🔄</Text>
         </TouchableOpacity>
@@ -185,7 +185,7 @@ export default function MealPlanningScreen() {
               <Text>Fats: {item.fats}g</Text>
 
               <TouchableOpacity style={styles.button} onPress={() => logMeal(item)}>
-                <Text style={styles.buttonText}>🍽️ Log Meal</Text>
+                <Text style={styles.buttonText}>Log Meal</Text>
               </TouchableOpacity>
 
               <TouchableOpacity 
@@ -197,14 +197,14 @@ export default function MealPlanningScreen() {
                params: { mealId: String(item.spoonacular_id) } // ✅ Use Spoonacular ID, not custom ID
                     });
                    }}>
-               <Text style={styles.buttonText}>📖 View Recipe</Text>
+               <Text style={styles.buttonText}>View Recipe</Text>
               </TouchableOpacity>
 
             </View>
           )}
           ListFooterComponent={
             <TouchableOpacity style={[styles.button, { marginTop: 20, marginBottom: 20 }]} onPress={() => router.push("/logged-meals")}>
-              <Text style={styles.buttonText}>📋 View Logged Meals</Text>
+              <Text style={styles.buttonText}>View Logged Meals</Text>
             </TouchableOpacity>
           }
           contentContainerStyle={{ paddingBottom: 100 }}
