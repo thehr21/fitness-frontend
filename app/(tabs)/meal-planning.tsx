@@ -1,21 +1,9 @@
 import { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Alert, Image } from "react-native";
 import { useRouter } from "expo-router";
-import { jwtDecode } from "jwt-decode";  // ✅ Correct import
+import { jwtDecode } from "jwt-decode"; 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#FFF3E0", paddingBottom: 100 },
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 20, paddingTop: 50 },
-  title: { fontSize: 24, fontWeight: "bold", textAlign: "center" },
-  subtitle: { fontSize: 18, textAlign: "center", flex: 1 },
-  card: { backgroundColor: "#fff", padding: 15, borderRadius: 10, marginBottom: 10, elevation: 2, alignItems: "center" },
-  mealImage: { width: 100, height: 100, borderRadius: 10, marginBottom: 10, backgroundColor: "#e0e0e0" },
-  mealName: { fontSize: 18, fontWeight: "bold" },
-  errorText: { fontSize: 16, color: "red", textAlign: "center", marginTop: 10 },
-  button: { marginTop: 10, padding: 10, borderRadius: 5, backgroundColor: "#4CAF50", alignItems: "center" },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-});
 
 const getUserIdFromToken = async () => {
   try {
@@ -225,3 +213,72 @@ export default function MealPlanningScreen() {
     </View>
   );
 }
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#fff",
+    paddingBottom: 100,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
+    paddingTop: 50,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  subtitle: {
+    fontSize: 18,
+    textAlign: "center",
+    flex: 1,
+  },
+  card: {
+    backgroundColor: "#f0f0f0",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    elevation: 2,
+    alignItems: "center",
+  },
+  mealImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    marginBottom: 10,
+    backgroundColor: "#e0e0e0",
+  },
+  mealName: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  errorText: {
+    fontSize: 16,
+    color: "red",
+    textAlign: "center",
+    marginTop: 10,
+  },
+  button: {
+    marginTop: 10,
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: "#007bff",
+    alignItems: "center",
+    marginHorizontal: 5,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 14,
+    textAlign: "center",
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+  },
+});

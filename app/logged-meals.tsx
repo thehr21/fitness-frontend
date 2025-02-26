@@ -1,18 +1,8 @@
 import { useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity } from "react-native";
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from "react-native";
 import { useRouter } from "expo-router";
-import { jwtDecode } from "jwt-decode";  // ✅ Correct import
+import { jwtDecode } from "jwt-decode"; 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#FFF3E0" },
-  title: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 10 },
-  card: { backgroundColor: "#fff", padding: 15, borderRadius: 10, marginBottom: 10, elevation: 2 },
-  mealName: { fontSize: 18, fontWeight: "bold" },
-  errorText: { fontSize: 16, color: "red", textAlign: "center", marginTop: 10 },
-  button: { marginTop: 20, padding: 15, borderRadius: 8, backgroundColor: "#4CAF50", alignItems: "center" },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-});
 
 const getUserIdFromToken = async () => {
   try {
@@ -90,7 +80,7 @@ export default function LoggedMealsScreen() {
       <Text style={styles.title}>📋 Logged Meals</Text>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#4CAF50" />
+        <ActivityIndicator size="large" color="#007bff" />
       ) : error ? (
         <Text style={styles.errorText}>❌ {error}</Text>
       ) : (
@@ -116,3 +106,46 @@ export default function LoggedMealsScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  card: {
+    backgroundColor: "#f0f0f0",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    elevation: 2,
+  },
+  mealName: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  errorText: {
+    fontSize: 16,
+    color: "red",
+    textAlign: "center",
+    marginTop: 10,
+  },
+  button: {
+    marginTop: 20,
+    padding: 15,
+    borderRadius: 8,
+    backgroundColor: "#007bff",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+});
