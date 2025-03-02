@@ -104,16 +104,37 @@ export default function WorkoutPlanScreen() {
 
   const logWorkout = async (exercise: Exercise) => {
     try {
+      console.log("Logging workout:", exercise);
+
+      // ✅ Keep your existing logic unchanged
       const loggedWorkouts = await AsyncStorage.getItem("logged_workouts");
       const workouts = loggedWorkouts ? JSON.parse(loggedWorkouts) : [];
       workouts.push({ ...exercise, logged_at: new Date().toISOString() });
       await AsyncStorage.setItem("logged_workouts", JSON.stringify(workouts));
+
       Alert.alert("Success", "Workout logged successfully!");
+
+      console.log("✅ Workout saved in local storage!");
+
+      // ✅ Step 2: Send streak update request to backend
+      const streakResponse = await fetch("http://192.168.0.229:8000/gamification/log-activity", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId, activity_type: "workout" }),
+      });
+
+      if (!streakResponse.ok) {
+        console.error("❌ Failed to update workout streak.");
+      } else {
+        console.log("🔥 Workout streak updated successfully!");
+      }
+
     } catch (error) {
       console.error("❌ Error logging workout:", error);
-      Alert.alert("Error", "Failed to log workout.");
+      Alert.alert("❌ Error", "Failed to log workout.");
     }
-  };
+};
+
 
   const headerHeight = scrollY.interpolate({
     inputRange: [0, 200],

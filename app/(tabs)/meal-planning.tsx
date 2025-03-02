@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Alert, Image } from "react-native";
+import { useEffect, useState, useRef } from "react";
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Alert, Image, Animated, SafeAreaView } from "react-native";
 import { useRouter } from "expo-router";
 import { jwtDecode } from "jwt-decode"; 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 
 const getUserIdFromToken = async () => {
   try {
@@ -20,7 +19,7 @@ const getUserIdFromToken = async () => {
     console.error("Error decoding token:", error);
     return null;
   }
-};
+}; 
 
 export default function MealPlanningScreen() {
   const router = useRouter();
@@ -41,6 +40,7 @@ export default function MealPlanningScreen() {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -117,6 +117,7 @@ export default function MealPlanningScreen() {
   const logMeal = async (meal: Meal) => {
     try {
       console.log("Logging meal:", meal);
+
       const response = await fetch("http://192.168.0.229:8000/log-meals/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -129,15 +130,35 @@ export default function MealPlanningScreen() {
           fats: meal.fats,
         }),
       });
+
       if (!response.ok) {
         throw new Error("Failed to log meal");
       }
+
       Alert.alert("✅ Meal Logged!", `${meal.food_item} has been logged successfully.`);
+
+      // ✅ Keep your existing logging behavior intact
+      console.log(" Meal logged successfully!");
+
+      // ✅ Step 2: Log meal activity for streak tracking
+      const streakResponse = await fetch("http://192.168.0.229:8000/gamification/log-activity", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId, activity_type: "meal" }),
+      });
+
+      if (!streakResponse.ok) {
+        console.error("❌ Failed to update meal streak.");
+      } else {
+        console.log("🔥 Meal streak updated successfully!");
+      }
+
     } catch (error) {
       console.error("❌ Meal logging error:", error);
       Alert.alert("❌ Error", "Could not log the meal. Please try again.");
     }
-  };
+};
+
 
   const refreshMeals = async () => {
     try {
@@ -158,26 +179,42 @@ export default function MealPlanningScreen() {
     }
   };
 
+  const headerHeight = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [60, 0],
+    extrapolate: 'clamp',
+  });
+
+  const headerOpacity = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <SafeAreaView style={styles.container}>
+      <Animated.View style={[styles.header, { height: headerHeight, opacity: headerOpacity }]}>
         <Text style={styles.subtitle}>GOAL: {userGoal ? userGoal.replace("_", " ").toUpperCase() : "Loading..."}</Text>
-        <TouchableOpacity style={styles.button} onPress={refreshMeals}>
+        <TouchableOpacity style={styles.refreshButton} onPress={refreshMeals}>
           <Text>🔄</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
       {loading ? (
         <ActivityIndicator size="large" color="#4CAF50" />
       ) : error ? (
         <Text style={styles.errorText}>❌ {error}</Text>
       ) : (
-        <FlatList
+        <Animated.FlatList
           data={meals}
           keyExtractor={(item) => item.id.toString()}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
           renderItem={({ item }) => (
             <View style={styles.card}>
-              <Image source={{ uri: item.image || "https://via.placeholder.com/100" }} style={styles.mealImage} />
+              <Image source={{ uri: item.image }} style={styles.mealImage} resizeMode="cover" />
               <Text style={styles.mealName}>{item.food_item}</Text>
               <Text>Calories: {item.calories} kcal</Text>
               <Text>Protein: {item.protein}g</Text>
@@ -199,7 +236,6 @@ export default function MealPlanningScreen() {
                    }}>
                <Text style={styles.buttonText}>View Recipe</Text>
               </TouchableOpacity>
-
             </View>
           )}
           ListFooterComponent={
@@ -210,9 +246,10 @@ export default function MealPlanningScreen() {
           contentContainerStyle={{ paddingBottom: 100 }}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -223,9 +260,11 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
-    paddingTop: 50,
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
   },
   title: {
     fontSize: 24,
@@ -246,8 +285,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   mealImage: {
-    width: 100,
-    height: 100,
+    width: "100%",
+    height: 150,
     borderRadius: 10,
     marginBottom: 10,
     backgroundColor: "#e0e0e0",
@@ -280,5 +319,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 10,
+  },
+  refreshButton: {
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 8,
+    alignItems: "center",
+    marginHorizontal: 5,
   },
 });
