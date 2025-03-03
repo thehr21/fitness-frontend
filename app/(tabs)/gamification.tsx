@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Image } from "react-native";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Alert } from "react-native";
 import { ProgressBar } from "react-native-paper";
 import { FontAwesome5 } from "@expo/vector-icons";
 import ConfettiCannon from "react-native-confetti-cannon";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function GamificationScreen() {
   const [userId, setUserId] = useState<number | null>(null);
   const [streaks, setStreaks] = useState({ workout: 0, meal: 0 });
   const [bestStreaks, setBestStreaks] = useState({ workout: 0, meal: 0 });
   const [totalLogs, setTotalLogs] = useState({ workout: 0, meal: 0 });
-  const [badges, setBadges] = useState<{ id: number; name: string; fa_icon_class: string | null; image_url: string | null; earned: boolean }[]>([]);
+  const [badges, setBadges] = useState<{ id: number; name: string; fa_icon_class: string | null; earned: boolean }[]>([]);
   const [loading, setLoading] = useState(true);
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -23,7 +24,6 @@ export default function GamificationScreen() {
         console.error("Error fetching user ID:", error);
       }
     };
-
     fetchUserId();
   }, []);
 
@@ -33,6 +33,14 @@ export default function GamificationScreen() {
       const response = await fetch(`http://192.168.0.229:8000/gamification/user-progress?user_id=${userId}`);
       if (!response.ok) throw new Error("Failed to fetch user progress");
       const data = await response.json();
+
+      // Check if best streak is broken
+      if (data.best_streaks.workout > bestStreaks.workout) {
+        Alert.alert("🏆 New Best Streak!", `🔥 You just hit a new workout streak of ${data.best_streaks.workout} days!`);
+      }
+      if (data.best_streaks.meal > bestStreaks.meal) {
+        Alert.alert("🏆 New Best Streak!", `🍽️ You just hit a new meal streak of ${data.best_streaks.meal} days!`);
+      }
 
       setStreaks(data.current_streaks);
       setBestStreaks(data.best_streaks);
@@ -58,61 +66,38 @@ export default function GamificationScreen() {
         id: achievement.id,
         name: achievement.name,
         fa_icon_class: achievement.fa_icon_class.startsWith("fa-") ? achievement.fa_icon_class : null,
-        image_url: !achievement.fa_icon_class.startsWith("fa-")
-          ? `https://example.com/icons/${achievement.name.replace(/ /g, "_").toLowerCase()}.png`
-          : null,
         earned: earnedBadges.some((badge: { id: number }) => badge.id === achievement.id),
       }));
 
-      setBadges((prevBadges) => {
-        if (JSON.stringify(prevBadges) !== JSON.stringify(mergedBadges)) {
-          return mergedBadges;
-        }
-        return prevBadges;
-      });
+      // Detect newly earned badges
+      const newlyEarned = mergedBadges.filter((badge: { id: number; earned: boolean }) => badge.earned && !badges.some((b) => b.id === badge.id && b.earned));
+      if (newlyEarned.length > 0) {
+        Alert.alert("🎖️ New Badge Earned!", `You earned: ${newlyEarned.map((b: { name: string }) => b.name).join(", ")}`);
+        setShowConfetti(true);
+      }
 
-      if (earnedBadges.length > 0) setShowConfetti(true);
+      setBadges(mergedBadges);
     } catch (error) {
       console.error("Error fetching badges:", error);
     }
   };
 
   useEffect(() => {
-    let isMounted = true;
-
-    const fetchData = async () => {
-      if (!userId) return;
-      await fetchGamificationData();
-      await fetchBadges();
-    };
-
-    fetchData();
-
-    return () => {
-      isMounted = false;
-    };
+    if (userId !== null) {
+      fetchGamificationData();
+      fetchBadges();
+    }
   }, [userId]);
 
-  const logActivity = async (activityType: string) => {
-    try {
-      const response = await fetch("http://192.168.0.229:8000/gamification/log-activity", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId, activity_type: activityType }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to log activity");
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userId !== null) {
+        console.log("🔄 Updating gamification data...");
+        fetchGamificationData();
+        fetchBadges();
       }
-
-      console.log(`✅ ${activityType} logged successfully!`);
-
-      await fetchGamificationData();
-      await fetchBadges();
-    } catch (error) {
-      console.error(`❌ Failed to log ${activityType}:`, error);
-    }
-  };
+    }, [userId])
+  );
 
   return (
     <View style={styles.container}>
@@ -128,24 +113,34 @@ export default function GamificationScreen() {
           </View>
 
           <View style={styles.progressContainer}>
-            <Text>Workouts Logged: {totalLogs.workout} / 100</Text>
+            <Text style={styles.progressText}>Workouts Logged: {totalLogs.workout} / 100</Text>
             <ProgressBar progress={totalLogs.workout / 100} color="#4CAF50" style={styles.progressBar} />
 
-            <Text>Meals Logged: {totalLogs.meal} / 100</Text>
+            <Text style={styles.progressText}>Meals Logged: {totalLogs.meal} / 100</Text>
             <ProgressBar progress={totalLogs.meal / 100} color="#FFA500" style={styles.progressBar} />
           </View>
 
-          <Text style={styles.subHeader}>🎖️ Achievements</Text>
+          <Text style={styles.header}>🎖️ Achievements</Text>
+
           <FlatList
             data={badges}
+            key={2}
             keyExtractor={(item) => item.id.toString()}
-            horizontal
+            numColumns={2}
+            columnWrapperStyle={styles.badgeRow}
+            contentContainerStyle={{ paddingBottom: 150 }}
+            ListFooterComponent={<View style={{ height: 50 }} />}
             renderItem={({ item }) => (
               <View style={[styles.badgeItem, !item.earned && styles.lockedBadge]}>
                 {item.fa_icon_class ? (
-                  <FontAwesome5 name={item.fa_icon_class as any} size={32} color={item.earned ? "#FFD700" : "#AAA"} />
+                  <FontAwesome5
+                    name={item.fa_icon_class.replace("fa-", "") as any}
+                    size={40}
+                    color={item.earned ? "#FFD700" : "#AAA"}
+                    solid
+                  />
                 ) : (
-                  <Image source={{ uri: item.image_url || 'https://via.placeholder.com/150' }} style={[styles.badgeIcon, !item.earned && styles.lockedBadge]} />
+                  <FontAwesome5 name="question-circle" size={40} color="#AAA" solid />
                 )}
                 <Text style={[styles.badgeText, !item.earned && styles.lockedText]}>{item.name}</Text>
               </View>
@@ -160,16 +155,16 @@ export default function GamificationScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFFDE7", padding: 20 },
-  header: { fontSize: 22, fontWeight: "bold", textAlign: "center", marginBottom: 10 },
+  container: { flex: 1, backgroundColor: "#FFF", padding: 20 },
+  header: { fontSize: 22, fontWeight: "bold", textAlign: "center", marginBottom: 20, marginTop: 40, color: "#333" },
   streakContainer: { marginVertical: 10 },
-  streakText: { fontSize: 16, fontWeight: "bold", marginBottom: 5 },
+  streakText: { fontSize: 16, fontWeight: "bold", marginBottom: 5, color: "#333" },
   progressContainer: { marginVertical: 10 },
+  progressText: { fontSize: 14, color: "#333", marginBottom: 5 },
   progressBar: { height: 10, borderRadius: 5, marginVertical: 5 },
-  subHeader: { fontSize: 18, fontWeight: "bold", marginVertical: 10 },
-  badgeItem: { alignItems: "center", marginRight: 20 },
+  badgeRow: { justifyContent: "space-between", marginBottom: 15 },
+  badgeItem: { flex: 1, alignItems: "center", marginHorizontal: 10, marginBottom: 10 },
   lockedBadge: { opacity: 0.4 },
-  badgeText: { fontSize: 14, marginTop: 5, textAlign: "center" },
+  badgeText: { fontSize: 14, marginTop: 5, textAlign: "center", color: "#333" },
   lockedText: { color: "#777" },
-  badgeIcon: { width: 40, height: 40, resizeMode: "contain", marginBottom: 5 },
 });
