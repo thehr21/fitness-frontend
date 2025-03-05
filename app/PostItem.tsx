@@ -7,7 +7,12 @@ const API_URL = "http://192.168.0.229:8000/community";
 
 interface Post {
   id: number;
-  user_id: number;
+  user: {
+    id: number;
+    full_name: string;
+    username: string;
+    profile_picture?: string;
+  };
   content: string;
   media_url?: string;
   likes: number;
@@ -34,8 +39,16 @@ export default function PostItem({ post }: { post: Post }) {
   };
 
   return (
-    <View style={[styles.postContainer, !post.media_url && styles.smallPost]}>
-      <Text style={styles.userText}>User {post.user_id}</Text>
+    <View style={styles.postContainer}>
+      {/* ✅ Display Profile Picture & Name */}
+      <View style={styles.userInfo}>
+        <Image
+          source={{ uri: post.user.profile_picture || "https://via.placeholder.com/50" }}
+          style={styles.profilePic}
+        />
+        <Text style={styles.userText}>{post.user.full_name} (@{post.user.username})</Text>
+      </View>
+
       <Text style={styles.content}>{post.content}</Text>
 
       {post.media_url && (
@@ -63,21 +76,14 @@ export default function PostItem({ post }: { post: Post }) {
 }
 
 const styles = StyleSheet.create({
-  postContainer: {
-    backgroundColor: "#FFF",
-    padding: 15,
-    marginBottom: 10,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  smallPost: { paddingVertical: 8 },
-  userText: { fontSize: 14, fontWeight: "bold", color: "#666", marginBottom: 5 },
+  postContainer: { padding: 15, backgroundColor: "#FFF", borderRadius: 10, marginBottom: 10 },
+  userInfo: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
+  profilePic: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
+  userText: { fontSize: 14, fontWeight: "bold", color: "#333" },
   content: { fontSize: 16, color: "#333", marginBottom: 10 },
-  media: { width: "100%", height: 200, borderRadius: 8, marginBottom: 10 },
+  media: { width: "100%", height: 200, borderRadius: 8 },
   actions: { flexDirection: "row", justifyContent: "space-between" },
   actionButton: { flexDirection: "row", alignItems: "center", padding: 5 },
   actionText: { marginLeft: 5, fontSize: 14, color: "#333" },
 });
+

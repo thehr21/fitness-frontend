@@ -8,24 +8,48 @@ import {
   TouchableOpacity,
   Image,
   FlatList,
+  Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import PostItem from "../PostItem";
 
-const API_URL = "http://192.168.0.229:8000/community"; // Backend URL
+const API_URL = "http://192.168.0.229:8000/community"; // ✅ Backend URL
 
 function CommunityScreen() {
   interface Post {
     id: number;
     content: string;
     media_url?: string;
-    user_id: number;
+    user: {
+      id: number;
+      full_name: string;
+      username: string;
+      profile_picture?: string;
+    };
     likes: number;
   }
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [newPostText, setNewPostText] = useState("");
   const [selectedMedia, setSelectedMedia] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
+
+  // ✅ Fetch stored user ID
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const storedId = await AsyncStorage.getItem("user_id");
+        if (storedId) {
+          setUserId(parseInt(storedId, 10));
+        }
+      } catch (error) {
+        console.error("❌ Error fetching user ID:", error);
+      }
+    };
+    fetchUserId();
+    fetchPosts();
+  }, []);
 
   // ✅ Fetch posts
   const fetchPosts = async () => {
@@ -34,24 +58,28 @@ function CommunityScreen() {
       const data = await response.json();
       setPosts(data.reverse());
     } catch (error) {
-      console.error("Error fetching posts:", error);
+      console.error("❌ Error fetching posts:", error);
     }
   };
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
   // ✅ Handle Creating a New Post
   const createPost = async () => {
-    if (!newPostText.trim() && !selectedMedia) return;
+    if (!newPostText.trim() && !selectedMedia) {
+      Alert.alert("⚠️ Error", "Post content cannot be empty!");
+      return;
+    }
+
+    if (!userId) {
+      Alert.alert("⚠️ Error", "User not found!");
+      return;
+    }
 
     try {
       const response = await fetch(`${API_URL}/create-post`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          user_id: 1,
+          user_id: userId,
           content: newPostText,
           media_url: selectedMedia,
         }),
@@ -61,9 +89,10 @@ function CommunityScreen() {
 
       setNewPostText("");
       setSelectedMedia(null);
-      fetchPosts();
+      fetchPosts(); // Refresh posts after creating one
     } catch (error) {
-      console.error("Error creating post:", error);
+      console.error("❌ Error creating post:", error);
+      Alert.alert("❌ Error", "Could not create post.");
     }
   };
 
@@ -87,6 +116,7 @@ function CommunityScreen() {
         <Text style={styles.headerText}>🌿 Wellness</Text>
       </View>
 
+      {/* ✅ Post Creation Section */}
       <View style={styles.createPostContainer}>
         <TextInput
           style={styles.input}
@@ -120,6 +150,7 @@ function CommunityScreen() {
   );
 }
 
+// ✅ Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
