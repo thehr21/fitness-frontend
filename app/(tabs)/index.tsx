@@ -12,6 +12,11 @@ export default function HomeScreen() {
         <Ionicons name="settings-outline" size={28} color="black" />
       </TouchableOpacity>
 
+      {/* ✅ Profile Button (Top Right) */}
+      <TouchableOpacity onPress={() => router.push("/profile")} style={styles.profileButton}>
+        <Ionicons name="person-circle-outline" size={30} color="black" />
+      </TouchableOpacity>
+
       {/* ✅ Centered Welcome Message */}
       <Ionicons name="fitness-outline" size={60} color="#4CAF50" style={styles.icon} />
       <Text style={styles.welcomeText}>Welcome to Fitness App!</Text>
@@ -22,6 +27,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#F5F5F5" },
   settingsButton: { position: "absolute", top: 40, left: 20 },
+  profileButton: { position: "absolute", top: 40, right: 20 }, // ✅ Added Profile button
   icon: { marginBottom: 20 },
   welcomeText: { fontSize: 24, fontWeight: "bold", color: "#333" },
 });

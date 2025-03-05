@@ -43,6 +43,9 @@ export default function RootLayout() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="recipe" options={{ headerShown: true }} />  
       <Stack.Screen name="LoggedExercisesScreen" options={{ headerShown: true, title: "Logged Exercises" }} />
+      
+      {/* 🔹 Profile Screen */}
+      <Stack.Screen name="profile" options={{ headerShown: true, title: "Your Profile" }} />
     </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
@@ -15,7 +14,7 @@ import PostItem from "../PostItem";
 
 const API_URL = "http://192.168.0.229:8000/community"; // Backend URL
 
-export default function CommunityScreen() {
+function CommunityScreen() {
   interface Post {
     id: number;
     content: string;
@@ -52,7 +51,7 @@ export default function CommunityScreen() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          user_id: 1, // Ensure user_id is passed inside body
+          user_id: 1,
           content: newPostText,
           media_url: selectedMedia,
         }),
@@ -92,6 +91,7 @@ export default function CommunityScreen() {
         <TextInput
           style={styles.input}
           placeholder="What's on your mind?"
+          placeholderTextColor="#999"
           value={newPostText}
           onChangeText={setNewPostText}
         />
@@ -99,20 +99,21 @@ export default function CommunityScreen() {
           <Image source={{ uri: selectedMedia }} style={styles.previewImage} />
         )}
         <View style={styles.buttonRow}>
-          <TouchableOpacity onPress={pickMedia} style={styles.mediaButton}>
-            <Text style={styles.buttonText}>📸 Add Photo/Video</Text>
+          <TouchableOpacity onPress={pickMedia}>
+            <Text style={styles.photoText}>Add Photo/Video</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={createPost} style={styles.postButton}>
-            <Text style={styles.buttonText}>➕ Post</Text>
+          <TouchableOpacity onPress={createPost}>
+            <Text style={styles.postText}>Post</Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* ✅ Properly implemented FlatList */}
+      {/* ✅ Render Posts using FlatList */}
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <PostItem post={item} />}
+        contentContainerStyle={styles.postsContainer}
         ListFooterComponent={<View style={{ height: 80 }} />} // Space for bottom nav
       />
     </SafeAreaView>
@@ -120,13 +121,22 @@ export default function CommunityScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F8F9FA" },
+  container: {
+    flex: 1,
+    backgroundColor: "#F5F5F5",
+  },
   header: {
     padding: 20,
     alignItems: "center",
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#F8F8F8",
+    borderBottomWidth: 1,
+    borderBottomColor: "#DDD",
   },
-  headerText: { fontSize: 22, fontWeight: "bold", color: "#FFF" },
+  headerText: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#333",
+  },
   createPostContainer: {
     backgroundColor: "#FFF",
     padding: 15,
@@ -135,15 +145,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
-    marginBottom: 20,
+    margin: 15,
   },
   input: {
     height: 50,
     borderWidth: 1,
-    borderColor: "#DDD",
+    borderColor: "#CCC",
     borderRadius: 8,
     paddingHorizontal: 10,
     marginBottom: 10,
+    color: "#333",
+    backgroundColor: "#FAFAFA",
   },
   previewImage: {
     width: "100%",
@@ -154,16 +166,21 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    paddingHorizontal: 5,
   },
-  mediaButton: {
-    backgroundColor: "#DDD",
-    padding: 10,
-    borderRadius: 8,
+  photoText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#666",
   },
-  postButton: {
-    backgroundColor: "#4CAF50",
-    padding: 10,
-    borderRadius: 8,
+  postText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#007BFF", // ✅ Blue text for Post button
   },
-  buttonText: { color: "#FFF", fontWeight: "bold" },
+  postsContainer: {
+    paddingHorizontal: 15,
+  },
 });
+
+export default CommunityScreen;
