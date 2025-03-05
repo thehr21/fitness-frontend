@@ -34,13 +34,16 @@ export default function GamificationScreen() {
       if (!response.ok) throw new Error("Failed to fetch user progress");
       const data = await response.json();
 
-      // Check if best streak is broken
-      if (data.best_streaks.workout > bestStreaks.workout) {
+      const previousBestStreaks = JSON.parse(await AsyncStorage.getItem("best_streaks") || "{}");
+
+      if (data.best_streaks.workout > (previousBestStreaks.workout || 0)) {
         Alert.alert("🏆 New Best Streak!", `🔥 You just hit a new workout streak of ${data.best_streaks.workout} days!`);
       }
-      if (data.best_streaks.meal > bestStreaks.meal) {
+      if (data.best_streaks.meal > (previousBestStreaks.meal || 0)) {
         Alert.alert("🏆 New Best Streak!", `🍽️ You just hit a new meal streak of ${data.best_streaks.meal} days!`);
       }
+
+      await AsyncStorage.setItem("best_streaks", JSON.stringify(data.best_streaks));
 
       setStreaks(data.current_streaks);
       setBestStreaks(data.best_streaks);
@@ -69,12 +72,18 @@ export default function GamificationScreen() {
         earned: earnedBadges.some((badge: { id: number }) => badge.id === achievement.id),
       }));
 
-      // Detect newly earned badges
-      const newlyEarned = mergedBadges.filter((badge: { id: number; earned: boolean }) => badge.earned && !badges.some((b) => b.id === badge.id && b.earned));
+      const previousBadges = JSON.parse(await AsyncStorage.getItem("earned_badges") || "[]");
+
+      const newlyEarned = mergedBadges.filter((badge: { id: number; earned: boolean }) => 
+        badge.earned && !previousBadges.includes(badge.id)
+      );
+
       if (newlyEarned.length > 0) {
         Alert.alert("🎖️ New Badge Earned!", `You earned: ${newlyEarned.map((b: { name: string }) => b.name).join(", ")}`);
         setShowConfetti(true);
       }
+
+      await AsyncStorage.setItem("earned_badges", JSON.stringify(earnedBadges.map((b: { id: number }) => b.id)));
 
       setBadges(mergedBadges);
     } catch (error) {
@@ -154,6 +163,7 @@ export default function GamificationScreen() {
   );
 }
 
+/** ✅ Styles fixed! */
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#FFF", padding: 20 },
   header: { fontSize: 22, fontWeight: "bold", textAlign: "center", marginBottom: 20, marginTop: 40, color: "#333" },
