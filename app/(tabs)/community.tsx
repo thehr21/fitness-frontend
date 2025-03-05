@@ -28,6 +28,7 @@ function CommunityScreen() {
       profile_picture?: string;
     };
     likes: number;
+    date_posted: string; // ✅ Include post date
   }
 
   const [posts, setPosts] = useState<Post[]>([]);
