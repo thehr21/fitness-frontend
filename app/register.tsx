@@ -10,13 +10,13 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ fullName: "", username: "", email: "", password: "" });
 
-  // ✅ Password validation function
+  //  Password validation function
   const validatePassword = (password: string) => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     return regex.test(password);
   };
 
-  // ✅ Check if email is already registered
+  //  Check if email is already registered
   const checkEmailExists = async (email: string) => {
     try {
       const response = await fetch("http://192.168.0.229:8000/auth/check-email", {
@@ -39,7 +39,7 @@ export default function Register() {
     }
   };
 
-  // ✅ Handle Next Button Click
+  //  Handle Next Button Click
   const handleNext = async () => {
     let newErrors = { fullName: "", username: "", email: "", password: "" };
 
@@ -51,17 +51,17 @@ export default function Register() {
 
     setErrors(newErrors);
 
-    // ✅ Stop if there are validation errors
+    //  Stop if there are validation errors
     if (Object.values(newErrors).some((err) => err !== "")) return;
 
-    // ✅ Check if email is already registered
+    //  Check if email is already registered
     const emailError = await checkEmailExists(email);
     if (emailError !== true) {
       setErrors((prevErrors) => ({ ...prevErrors, email: emailError }));
       return;
     }
 
-    // ✅ If all validations pass, proceed
+    //  If all validations pass, proceed
     router.push({
       pathname: "/register0",
       params: { fullName, username, email, password },
@@ -114,8 +114,8 @@ const styles = StyleSheet.create({
   label: { fontSize: 16, fontWeight: "bold", color: "#555", marginBottom: 5 },
   input: { width: "100%", padding: 15, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, backgroundColor: "#fff" },
   error: { color: "red", fontSize: 14, marginTop: 5 },
-  button: { width: "100%", padding: 15, borderRadius: 8, alignItems: "center", backgroundColor: "#4CAF50", marginTop: 10 },
+  button: { width: "100%", padding: 15, borderRadius: 8, alignItems: "center", backgroundColor: "#007BFF", marginTop: 10 }, // Changed to blue
   buttonText: { fontSize: 18, fontWeight: "bold", color: "#fff" },
-  loginText: { marginTop: 15, color: "#4CAF50", textDecorationLine: "underline" },
+  loginText: { marginTop: 15, color: "#007BFF", textDecorationLine: "underline" }, // Changed to blue
 });
 

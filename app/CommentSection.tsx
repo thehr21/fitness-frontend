@@ -29,7 +29,7 @@ export default function CommentSection({ postId }: { postId: number }) {
   const [newComment, setNewComment] = useState("");
   const [userId, setUserId] = useState<number | null>(null);
 
-  // ✅ Fetch stored user ID
+  //  Fetch stored user ID
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -38,14 +38,14 @@ export default function CommentSection({ postId }: { postId: number }) {
           setUserId(parseInt(storedId, 10));
         }
       } catch (error) {
-        console.error("❌ Error fetching user ID:", error);
+        console.error(" Error fetching user ID:", error);
       }
     };
     fetchUserId();
     fetchComments();
   }, []);
 
-  // ✅ Fetch comments
+  //  Fetch comments
   const fetchComments = async () => {
     try {
       const response = await fetch(`${API_URL}/comments/${postId}`);
@@ -56,7 +56,7 @@ export default function CommentSection({ postId }: { postId: number }) {
     }
   };
 
-  // ✅ Handle Adding a New Comment
+  //  Handle Adding a New Comment
   const handleAddComment = async () => {
     if (!newComment.trim()) {
       Alert.alert("⚠️ Error", "Comment cannot be empty!");
@@ -108,7 +108,7 @@ export default function CommentSection({ postId }: { postId: number }) {
         )}
       />
 
-      {/* ✅ Comment Input Section */}
+      {/*  Comment Input Section */}
       <TextInput
         style={styles.input}
         placeholder="Write a comment..."

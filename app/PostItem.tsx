@@ -16,7 +16,7 @@ interface Post {
   content: string;
   media_url?: string;
   likes: number;
-  date_posted: string; // ✅ Include post date
+  date_posted: string; //  Include post date
 }
 
 export default function PostItem({ post }: { post: Post }) {
@@ -39,7 +39,7 @@ export default function PostItem({ post }: { post: Post }) {
     }
   };
 
-  // ✅ Format the post date safely
+  //  Format the post date safely
   const formatDate = (isoString: string) => {
     try {
       const date = new Date(isoString);
@@ -51,7 +51,7 @@ export default function PostItem({ post }: { post: Post }) {
 
   return (
     <View style={styles.postContainer}>
-      {/* ✅ Display Profile Picture & Name */}
+      {/*  Display Profile Picture & Name */}
       <View style={styles.userInfo}>
         <Image
           source={{ uri: post.user.profile_picture || "https://via.placeholder.com/50" }}
@@ -59,7 +59,7 @@ export default function PostItem({ post }: { post: Post }) {
         />
         <View>
           <Text style={styles.userText}>{post.user.full_name} (@{post.user.username})</Text>
-          {/* ✅ Wrap formatted date inside a <Text> component */}
+          {/*  Wrap formatted date inside a <Text> component */}
           <Text style={styles.dateText}>{formatDate(post.date_posted)}</Text>
         </View>
       </View>
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   userInfo: { flexDirection: "row", alignItems: "center", marginBottom: 10 },
   profilePic: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
   userText: { fontSize: 14, fontWeight: "bold", color: "#333" },
-  dateText: { fontSize: 12, color: "#666" }, // ✅ New Date Styling
+  dateText: { fontSize: 12, color: "#666" }, //  New Date Styling
   content: { fontSize: 16, color: "#333", marginBottom: 10 },
   media: { width: "100%", height: 200, borderRadius: 8 },
   actions: { flexDirection: "row", justifyContent: "space-between" },

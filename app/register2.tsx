@@ -5,12 +5,12 @@ import axios from "axios";
 
 export default function RegisterStep3() {
   const router = useRouter();
-  const params = useLocalSearchParams(); // ✅ Get all previous form data
+  const params = useLocalSearchParams(); //  Get all previous form data
 
   const [goal, setGoal] = useState("");
 
   const handleRegister = async () => {
-    console.log("📌 Sending registration data...", {
+    console.log(" Sending registration data...", {
       full_name: params.fullName,
       username: params.username,
       email: params.email,
@@ -45,11 +45,11 @@ export default function RegisterStep3() {
         throw new Error(data.detail || "Registration failed.");
       }
   
-      console.log("✅ Registration Success:", data);
+      console.log(" Registration Success:", data);
       Alert.alert("Success!", "You can now log in.");
       router.push("/login");
     } catch (error) {
-      console.log("❌ Registration Error:", error);
+      console.log(" Registration Error:", error);
       const errorMessage = error instanceof Error ? error.message : "Something went wrong.";
       Alert.alert("Registration Failed", errorMessage);
     }
@@ -119,10 +119,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
     borderWidth: 2,
-    borderColor: "#4CAF50",
+    borderColor: "#007BFF", // Changed to blue
   },
   selectedGoal: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#007BFF", // Changed to blue
   },
   goalText: {
     fontSize: 18,
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#007BFF", // Changed to blue
     marginTop: 10,
   },
   buttonText: {
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
   backText: {
     marginTop: 15,
-    color: "#4CAF50",
+    color: "#007BFF", // Changed to blue
     textDecorationLine: "underline",
   },
 });

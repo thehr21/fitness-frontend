@@ -4,14 +4,14 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 
 export default function RegisterStep2() {
   const router = useRouter();
-  const params = useLocalSearchParams(); // ✅ Get previous form data
+  const params = useLocalSearchParams(); //  Get previous form data
 
   const [gender, setGender] = useState("");
   const [currentWeight, setCurrentWeight] = useState("");
   const [targetWeight, setTargetWeight] = useState("");
   const [errors, setErrors] = useState({ gender: "", currentWeight: "", targetWeight: "" });
 
-  // ✅ Handle Next Button Click
+  //  Handle Next Button Click
   const handleNext = () => {
     let newErrors = { gender: "", currentWeight: "", targetWeight: "" };
 
@@ -21,10 +21,10 @@ export default function RegisterStep2() {
 
     setErrors(newErrors);
 
-    // ✅ Stop if errors exist
+    //  Stop if errors exist
     if (Object.values(newErrors).some((err) => err !== "")) return;
 
-    // ✅ If all validations pass, proceed
+    //  If all validations pass, proceed
     router.push({
       pathname: "/register2",
       params: {
@@ -80,7 +80,18 @@ const styles = StyleSheet.create({
   label: { fontSize: 16, fontWeight: "bold", color: "#555", marginBottom: 5 },
   input: { width: "100%", padding: 15, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, backgroundColor: "#fff" },
   error: { color: "red", fontSize: 14, marginTop: 5 },
-  button: { width: "100%", padding: 15, borderRadius: 8, alignItems: "center", backgroundColor: "#4CAF50", marginTop: 10 },
+  button: { 
+    width: "100%", 
+    padding: 15, 
+    borderRadius: 8, 
+    alignItems: "center", 
+    backgroundColor: "#007BFF", // Changed to blue
+    marginTop: 10 
+  },
   buttonText: { fontSize: 18, fontWeight: "bold", color: "#fff" },
-  backText: { marginTop: 15, color: "#4CAF50", textDecorationLine: "underline" },
+  backText: { 
+    marginTop: 15, 
+    color: "#007BFF", // Changed to blue
+    textDecorationLine: "underline" 
+  },
 });

@@ -4,13 +4,13 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 
 export default function ResetPassword() {
   const router = useRouter();
-  const { email } = useLocalSearchParams(); // ✅ Get email from params
+  const { email } = useLocalSearchParams(); //  Get email from params
 
   const [resetCode, setResetCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // ✅ Password validation function
+  //  Password validation function
   const validatePassword = (password: string) => {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     return regex.test(password);
@@ -34,10 +34,10 @@ export default function ResetPassword() {
       return;
     }
 
-    console.log("📌 Sending password reset request...");
+    console.log(" Sending password reset request...");
 
     try {
-      const response = await fetch("http://192.168.0.229:8000/auth/reset-password", { // ✅ Ensure correct IP
+      const response = await fetch("http://192.168.0.229:8000/auth/reset-password", { //  Ensure correct IP
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, reset_code: resetCode, new_password: newPassword }),
@@ -46,15 +46,15 @@ export default function ResetPassword() {
       const data = await response.json();
 
       if (!response.ok) {
-        console.log("❌ Reset Password Error:", data);
+        console.log(" Reset Password Error:", data);
         throw new Error(data.detail || "Something went wrong.");
       }
 
-      console.log("✅ Password Reset Successful:", data);
+      console.log("Password Reset Successful:", data);
       Alert.alert("Success", "Your password has been reset!");
       router.push("/welcome"); // 🚀 Redirect to welcome screen after success
     } catch (error) {
-      console.log("🔴 Reset Password Error:", error);
+      console.log(" Reset Password Error:", error);
       Alert.alert("Error", (error as Error).message || "Something went wrong.");
     }
   };
@@ -108,13 +108,53 @@ export default function ResetPassword() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20, backgroundColor: "#f5f5f5" },
-  title: { fontSize: 28, fontWeight: "bold", marginBottom: 20, color: "#333" },
-  inputContainer: { width: "100%", marginBottom: 10 },
-  label: { fontSize: 16, fontWeight: "bold", color: "#555", marginBottom: 5 },
-  input: { width: "100%", padding: 15, borderWidth: 1, borderColor: "#ccc", borderRadius: 8, backgroundColor: "#fff" },
-  button: { width: "100%", padding: 15, borderRadius: 8, alignItems: "center", backgroundColor: "#4CAF50", marginTop: 10 },
-  buttonText: { fontSize: 18, fontWeight: "bold", color: "#fff" },
-  linkText: { marginTop: 15, color: "#4CAF50", textDecorationLine: "underline" },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#f5f5f5",
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#333",
+  },
+  inputContainer: {
+    width: "100%",
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#555",
+    marginBottom: 5,
+  },
+  input: {
+    width: "100%",
+    padding: 15,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    backgroundColor: "#fff",
+  },
+  button: {
+    width: "100%",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    backgroundColor: "#007BFF", // Changed to blue
+    marginTop: 10,
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#fff",
+  },
+  linkText: {
+    marginTop: 15,
+    color: "#007BFF", // Changed to blue
+    textDecorationLine: "underline",
+  },
 });
-

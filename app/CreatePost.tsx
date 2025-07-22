@@ -41,14 +41,14 @@ export default function CreatePost({ onPostCreated }: { onPostCreated: () => voi
 
       if (!response.ok) throw new Error("Failed to create post");
 
-      Alert.alert("✅ Success", "Your post has been created!");
+      Alert.alert(" Success", "Your post has been created!");
       setContent(""); // Clear input
       onPostCreated(); // Refresh post list
     } catch (error) {
       if (error instanceof Error) {
-        Alert.alert("❌ Error", error.message);
+        Alert.alert(" Error", error.message);
       } else {
-        Alert.alert("❌ Error", "An unknown error occurred");
+        Alert.alert(" Error", "An unknown error occurred");
       }
     } finally {
       setLoading(false);

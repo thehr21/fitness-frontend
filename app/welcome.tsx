@@ -11,7 +11,7 @@ export default function Welcome() {
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          console.log("✅ Sign Up Button Clicked! Navigating to /register...");
+          console.log(" Sign Up Button Clicked! Navigating to /register...");
           router.push("/register");
         }}
       >
@@ -21,7 +21,7 @@ export default function Welcome() {
       <TouchableOpacity
         style={[styles.button, styles.secondaryButton]}
         onPress={() => {
-          console.log("✅ Login Button Clicked! Navigating to /login...");
+          console.log(" Login Button Clicked! Navigating to /login...");
           router.push("/login");
         }}
       >
@@ -40,21 +40,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
   },
   title: {
-    fontSize: 32,
+    fontSize: 32, // Increased font size for better visibility
     fontWeight: "bold",
-    marginBottom: 30,
+    marginBottom: 60, // Moved the heading higher
     color: "#333",
   },
   button: {
-    width: "80%",
-    padding: 15,
-    borderRadius: 8,
+    width: "80%", // Made the buttons wider
+    paddingVertical: 15, // Increased vertical padding for better touch area
+    borderRadius: 10, // Slightly rounded corners for a modern look
     alignItems: "center",
-    backgroundColor: "#4CAF50",
-    marginVertical: 10,
+    backgroundColor: "#007BFF", // Blue color for the primary button
+    marginBottom: 20, // Added more spacing between buttons
   },
   secondaryButton: {
-    backgroundColor: "#2E8B57",
+    backgroundColor: "#0056b3", // Slightly darker blue for the secondary button
   },
   buttonText: {
     fontSize: 18,

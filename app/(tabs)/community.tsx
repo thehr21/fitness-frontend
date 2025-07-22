@@ -14,7 +14,7 @@ import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PostItem from "../PostItem";
 
-const API_URL = "http://192.168.0.229:8000/community"; // ✅ Backend URL
+const API_URL = "http://192.168.0.229:8000/community"; //  Backend URL
 
 function CommunityScreen() {
   interface Post {
@@ -28,7 +28,7 @@ function CommunityScreen() {
       profile_picture?: string;
     };
     likes: number;
-    date_posted: string; // ✅ Include post date
+    date_posted: string; //  Include post date
   }
 
   const [posts, setPosts] = useState<Post[]>([]);
@@ -36,7 +36,7 @@ function CommunityScreen() {
   const [selectedMedia, setSelectedMedia] = useState<string | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
 
-  // ✅ Fetch stored user ID
+  //  Fetch stored user ID
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -52,7 +52,7 @@ function CommunityScreen() {
     fetchPosts();
   }, []);
 
-  // ✅ Fetch posts
+  //  Fetch posts
   const fetchPosts = async () => {
     try {
       const response = await fetch(`${API_URL}/posts`);
@@ -63,7 +63,7 @@ function CommunityScreen() {
     }
   };
 
-  // ✅ Handle Creating a New Post
+  //  Handle Creating a New Post
   const createPost = async () => {
     if (!newPostText.trim() && !selectedMedia) {
       Alert.alert("⚠️ Error", "Post content cannot be empty!");
@@ -92,12 +92,12 @@ function CommunityScreen() {
       setSelectedMedia(null);
       fetchPosts(); // Refresh posts after creating one
     } catch (error) {
-      console.error("❌ Error creating post:", error);
-      Alert.alert("❌ Error", "Could not create post.");
+      console.error(" Error creating post:", error);
+      Alert.alert(" Error", "Could not create post.");
     }
   };
 
-  // ✅ Handle Media Upload
+  //  Handle Media Upload
   const pickMedia = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -117,7 +117,7 @@ function CommunityScreen() {
         <Text style={styles.headerText}>🌿 Wellness</Text>
       </View>
 
-      {/* ✅ Post Creation Section */}
+      {/*  Post Creation Section */}
       <View style={styles.createPostContainer}>
         <TextInput
           style={styles.input}
@@ -139,7 +139,7 @@ function CommunityScreen() {
         </View>
       </View>
 
-      {/* ✅ Render Posts using FlatList */}
+      {/*  Render Posts using FlatList */}
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id.toString()}
@@ -151,7 +151,7 @@ function CommunityScreen() {
   );
 }
 
-// ✅ Styles
+//  Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   postText: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#007BFF", // ✅ Blue text for Post button
+    color: "#007BFF", //  Blue text for Post button
   },
   postsContainer: {
     paddingHorizontal: 15,

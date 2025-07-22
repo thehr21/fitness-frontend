@@ -9,7 +9,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    console.log("✅ Login Button Clicked");
+    console.log(" Login Button Clicked");
 
     if (!email || !password) {
       Alert.alert("Error", "Please enter both email and password.");
@@ -26,7 +26,7 @@ export default function Login() {
       const data = await response.json();
 
       if (!response.ok) {
-        console.log("🔴 Login Error:", data);
+        console.log(" Login Error:", data);
         throw new Error(data.detail || "Invalid credentials.");
       }
 
@@ -42,7 +42,7 @@ export default function Login() {
       Alert.alert("Welcome!", "Login successful.");
       router.push("/"); // 🚀 Navigate to home screen
     } catch (error) {
-      console.error("❌ Login Failed:", error);
+      console.error(" Login Failed:", error);
       Alert.alert("Login Failed", (error as any).message || "An unexpected error occurred.");
     }
   };
@@ -118,9 +118,13 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#007BFF", // Changed to blue
     marginTop: 10,
   },
   buttonText: { fontSize: 18, fontWeight: "bold", color: "#fff" },
-  linkText: { marginTop: 15, color: "#4CAF50", textDecorationLine: "underline" },
+  linkText: {
+    marginTop: 15,
+    color: "#007BFF", // Changed to blue
+    textDecorationLine: "underline",
+  },
 });

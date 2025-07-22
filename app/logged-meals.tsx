@@ -14,7 +14,7 @@ const getUserIdFromToken = async () => {
 
     const decodedToken: any = jwtDecode(token);
     console.log("🔑 Decoded Token:", decodedToken);
-    return decodedToken.sub;  // ✅ Correctly extracts user ID from the token
+    return decodedToken.sub;  //  Correctly extracts user ID from the token
   } catch (error) {
     console.error("⚠️ Error decoding token:", error);
     return null;
@@ -47,14 +47,14 @@ export default function LoggedMealsScreen() {
   }, []);
 
   useEffect(() => {
-    if (!userId) return; // ✅ Wait until userId is fetched before making API request
+    if (!userId) return; // Wait until userId is fetched before making API request
 
     const fetchLoggedMeals = async () => {
       try {
         setLoading(true);
         console.log(`📌 Fetching logged meals for user ${userId}...`);
 
-        const response = await fetch(`http://192.168.0.229:8000/log-meals/${userId}`); // ✅ Uses correct user ID
+        const response = await fetch(`http://192.168.0.229:8000/log-meals/${userId}`); //  Uses correct user ID
 
         if (!response.ok) {
           const errorMessage = await response.text();
@@ -73,7 +73,7 @@ export default function LoggedMealsScreen() {
     };
 
     fetchLoggedMeals();
-  }, [userId]); // ✅ Fetches meals only when userId is available
+  }, [userId]); //  Fetches meals only when userId is available
 
   return (
     <View style={styles.container}>

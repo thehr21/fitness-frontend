@@ -12,109 +12,101 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
-const API_URL = "http://192.168.0.229:8000"; // ✅ Ensure this matches your backend
+const API_URL = "http://192.168.0.229:8000";
 
 export default function ProfileScreen() {
   const [userId, setUserId] = useState<number | null>(null);
-  const [fullName, setFullName] = useState<string>("");
-  const [username, setUsername] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
+  const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [currentWeight, setCurrentWeight] = useState("");
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState(false); // ✅ Controls edit mode
+  const [editing, setEditing] = useState(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUserId = async () => {
-      try {
-        const storedId = await AsyncStorage.getItem("user_id");
-        if (storedId) {
-          setUserId(parseInt(storedId, 10));
-        }
-      } catch (error) {
-        console.error("Error fetching user ID:", error);
-      }
+      const storedId = await AsyncStorage.getItem("user_id");
+      if (storedId) setUserId(parseInt(storedId, 10));
     };
     fetchUserId();
   }, []);
 
   useEffect(() => {
-    if (userId !== null) {
-      fetchProfile(userId);
-    }
+    if (userId !== null) fetchProfile(userId);
   }, [userId]);
 
   const fetchProfile = async (id: number) => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/profile/${id}`);
-      if (!response.ok) throw new Error("Failed to fetch profile");
+      const res = await fetch(`${API_URL}/profile/${id}`);
+      const data = await res.json();
 
-      const data = await response.json();
       setFullName(data.full_name);
       setUsername(data.username);
       setEmail(data.email);
       setProfilePicture(data.profile_picture);
-    } catch (error) {
-      console.error("Error fetching profile:", error);
+      setCurrentWeight(data.current_weight?.toString() || "");
+    } catch (err) {
+      console.error("Error fetching profile:", err);
     } finally {
       setLoading(false);
     }
   };
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
-      aspect: [1, 1],
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
+      aspect: [1, 1],
     });
 
-    if (!result.canceled) {
-      uploadProfilePicture(result.assets[0].uri);
-    }
+    if (!result.canceled) uploadProfilePicture(result.assets[0].uri);
   };
 
   const uploadProfilePicture = async (imageUri: string) => {
-    let formData = new FormData();
-    const file = {
+    const formData = new FormData();
+    formData.append("file", {
       uri: imageUri,
       name: "profile.jpg",
       type: "image/jpg",
-    } as any;
-    formData.append("file", file);
+    } as any);
 
     try {
-      const response = await fetch(`${API_URL}/profile/${userId}/upload-picture`, {
+      await fetch(`${API_URL}/profile/${userId}/upload-picture`, {
         method: "POST",
-        body: formData,
         headers: { "Content-Type": "multipart/form-data" },
+        body: formData,
       });
-
-      if (!response.ok) throw new Error("Upload failed");
-
-      Alert.alert("✅ Profile Picture Updated!");
+      Alert.alert("✅ Profile picture updated!");
       fetchProfile(userId as number);
-    } catch (error) {
-      console.error("Error uploading profile picture:", error);
+    } catch (err) {
+      console.error("Error uploading:", err);
     }
   };
 
   const updateProfile = async () => {
     try {
-      const response = await fetch(`${API_URL}/profile/${userId}`, {
+      await fetch(`${API_URL}/profile/${userId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ full_name: fullName, username }),
+        body: JSON.stringify({ full_name: fullName, username, current_weight: currentWeight }),
       });
-
-      if (!response.ok) throw new Error("Failed to update profile");
-
-      Alert.alert("✅ Profile Updated!");
-      setEditing(false); // ✅ Disable edit mode after saving
-    } catch (error) {
-      console.error("Error updating profile:", error);
+      Alert.alert("✅ Profile updated!");
+      setEditing(false);
+    } catch (err) {
+      console.error("Error updating profile:", err);
     }
+  };
+
+  const handleLogout = async () => {
+    await AsyncStorage.clear();
+    router.replace("/login");
   };
 
   return (
@@ -123,7 +115,6 @@ export default function ProfileScreen() {
         <ActivityIndicator size="large" color="#4CAF50" />
       ) : (
         <>
-          {/* ✅ Profile Picture */}
           <View style={styles.profileImageContainer}>
             <Image
               source={{ uri: profilePicture || "https://via.placeholder.com/150" }}
@@ -134,43 +125,44 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* ✅ User Info */}
           <Text style={styles.label}>Full Name</Text>
-          <TextInput
-            style={styles.input}
-            value={fullName}
-            onChangeText={setFullName}
-            editable={editing}
-          />
+          <TextInput style={styles.input} value={fullName} onChangeText={setFullName} editable={editing} />
 
           <Text style={styles.label}>Username</Text>
-          <TextInput
-            style={styles.input}
-            value={username}
-            onChangeText={setUsername}
-            editable={editing}
-          />
+          <TextInput style={styles.input} value={username} onChangeText={setUsername} editable={editing} />
 
           <Text style={styles.label}>Email</Text>
           <TextInput style={styles.input} value={email} editable={false} />
 
-          {/* ✅ Buttons */}
+          <Text style={styles.label}>Current Weight (kg)</Text>
+          <TextInput
+            style={styles.input}
+            value={currentWeight}
+            onChangeText={setCurrentWeight}
+            editable={editing}
+            keyboardType="numeric"
+          />
+
           {editing ? (
-            <TouchableOpacity onPress={updateProfile} style={styles.saveButton}>
+            <TouchableOpacity style={styles.saveButton} onPress={updateProfile}>
               <Text style={styles.saveButtonText}>Save Changes</Text>
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity onPress={() => setEditing(true)} style={styles.editButton}>
+            <TouchableOpacity style={styles.editButton} onPress={() => setEditing(true)}>
               <Text style={styles.editButtonText}>Edit Profile</Text>
             </TouchableOpacity>
           )}
+
+          {/* 🔐 Log Out */}
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+            <Text style={styles.logoutText}>Log Out</Text>
+          </TouchableOpacity>
         </>
       )}
     </View>
   );
 }
 
-// ✅ Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -222,6 +214,8 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 5,
     marginTop: 10,
+    width: "100%",
+    alignItems: "center",
   },
   editButtonText: {
     color: "#FFF",
@@ -233,8 +227,23 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 5,
     marginTop: 10,
+    width: "100%",
+    alignItems: "center",
   },
   saveButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  logoutButton: {
+    marginTop: 25,
+    padding: 12,
+    borderRadius: 5,
+    backgroundColor: "#f44336",
+    width: "100%",
+    alignItems: "center",
+  },
+  logoutText: {
     color: "#FFF",
     fontSize: 16,
     fontWeight: "bold",

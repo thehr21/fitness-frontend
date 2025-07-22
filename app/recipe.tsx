@@ -71,11 +71,11 @@ export default function RecipeScreen() {
         }
 
         const data = await response.json();
-        console.log("✅ Recipe Details Fetched from API:", JSON.stringify(data, null, 2));
+        console.log(" Recipe Details Fetched from API:", JSON.stringify(data, null, 2));
 
         setRecipe(data);
       } catch (error) {
-        console.error("❌ Error fetching recipe details:", error);
+        console.error(" Error fetching recipe details:", error);
         setError(error instanceof Error ? error.message : "Unknown error occurred");
       } finally {
         setLoading(false);

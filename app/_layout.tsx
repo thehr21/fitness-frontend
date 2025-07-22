@@ -18,7 +18,7 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
-      router.replace("/welcome"); // 🚀 Redirects user to Welcome Screen
+      router.replace("/welcome"); //  Redirects user to Welcome Screen
     }
   }, [loaded]);
 

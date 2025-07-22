@@ -81,10 +81,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   selectedOption: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#007BFF", // Changed to blue
   },
   optionText: { fontSize: 16, color: "#333" },
-  button: { width: "100%", padding: 15, borderRadius: 8, alignItems: "center", backgroundColor: "#4CAF50", marginTop: 10 },
+  button: {
+    width: "100%",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    backgroundColor: "#007BFF", // Changed to blue
+    marginTop: 10,
+  },
   buttonText: { fontSize: 18, fontWeight: "bold", color: "#fff" },
 });
 

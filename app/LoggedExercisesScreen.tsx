@@ -8,11 +8,14 @@ import {
   Image,
   SafeAreaView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoggedExercisesScreen() {
   const [loggedExercises, setLoggedExercises] = useState<Exercise[]>([]);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   interface Exercise {
     id: string;
@@ -20,35 +23,66 @@ export default function LoggedExercisesScreen() {
     equipment: string;
     gifUrl: string;
     video_url?: string;
-    target_muscle: string;
+    muscle_group: string; //  FIXED: Use `muscle_group` instead of `target_muscle`
     difficulty: string;
     instructions?: string[];
-    logged_at: string;
+    timestamp: string; //  FIXED: Use `timestamp` instead of `logged_at`
   }
 
+  //  Fetch user ID from AsyncStorage
   useEffect(() => {
-    const loadLoggedExercises = async () => {
+    const fetchUserId = async () => {
       try {
-        const storedLoggedExercises = await AsyncStorage.getItem("logged_workouts");
-        if (storedLoggedExercises) {
-          setLoggedExercises(JSON.parse(storedLoggedExercises));
+        const storedUserId = await AsyncStorage.getItem("user_id");
+        if (storedUserId) {
+          setUserId(parseInt(storedUserId, 10));
+          console.log(" Loaded User ID:", storedUserId);
         } else {
-          console.log("❌ No logged exercises found.");
+          console.log(" No user ID found in storage.");
         }
       } catch (error) {
-        console.error("❌ Error loading logged exercises:", error);
+        console.error(" Error loading user ID:", error);
       }
     };
-    loadLoggedExercises();
+
+    fetchUserId();
   }, []);
 
+  //  Fetch logged workouts from backend when `userId` is available
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchLoggedWorkouts = async () => {
+      try {
+        setLoading(true);
+        console.log(" Fetching logged workouts...");
+        const response = await fetch(`http://192.168.0.229:8000/logged-workouts/${userId}`);
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch logged workouts");
+        }
+
+        const data = await response.json();
+        console.log(" Logged Workouts Fetched:", data);
+        setLoggedExercises(data);
+      } catch (error) {
+        console.error(" Error fetching logged workouts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLoggedWorkouts();
+  }, [userId]);
+
+  //  Clear logged workouts locally (does not clear backend)
   const clearLoggedExercises = async () => {
     try {
       await AsyncStorage.removeItem("logged_workouts");
       setLoggedExercises([]);
       Alert.alert("Success", "Logged exercises cleared successfully!");
     } catch (error) {
-      console.error("❌ Error clearing logged exercises:", error);
+      console.error(" Error clearing logged exercises:", error);
       Alert.alert("Error", "Failed to clear logged exercises.");
     }
   };
@@ -57,21 +91,29 @@ export default function LoggedExercisesScreen() {
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>📋 Logged Exercises</Text>
 
-      <FlatList
-        data={loggedExercises}
-        keyExtractor={(item, index) => `${item.id}-${index}`}
-        renderItem={({ item }) => (
-          <View style={styles.exerciseCard}>
-            <Image source={{ uri: item.gifUrl }} style={styles.exerciseImage} />
-            <View style={styles.exerciseDetails}>
-              <Text style={styles.exerciseName}>{item.name}</Text>
-              <Text style={styles.exerciseText}>Equipment: {item.equipment}</Text>
-              <Text style={styles.exerciseText}>Target Muscle: {item.target_muscle}</Text>
-              <Text style={styles.exerciseText}>Logged At: {new Date(item.logged_at).toLocaleString()}</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="#007bff" />
+      ) : loggedExercises.length === 0 ? (
+        <Text style={styles.noDataText}>No logged exercises found.</Text>
+      ) : (
+        <FlatList
+          data={loggedExercises}
+          keyExtractor={(item, index) => `${item.id}-${index}`}
+          renderItem={({ item }) => (
+            <View style={styles.exerciseCard}>
+              <Image source={{ uri: item.gifUrl }} style={styles.exerciseImage} />
+              <View style={styles.exerciseDetails}>
+                <Text style={styles.exerciseName}>{item.name}</Text>
+                <Text style={styles.exerciseText}>Equipment: {item.equipment}</Text>
+                <Text style={styles.exerciseText}>Muscle Group: {item.muscle_group}</Text>
+                <Text style={styles.exerciseText}>
+                  Logged At: {item.timestamp ? new Date(item.timestamp).toLocaleString() : "N/A"}
+                </Text>
+              </View>
             </View>
-          </View>
-        )}
-      />
+          )}
+        />
+      )}
 
       <TouchableOpacity style={styles.clearButton} onPress={clearLoggedExercises}>
         <Text style={styles.buttonText}>Clear Logged Exercises</Text>
@@ -80,6 +122,7 @@ export default function LoggedExercisesScreen() {
   );
 }
 
+//  Styling
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -91,6 +134,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginVertical: 16,
+  },
+  noDataText: {
+    fontSize: 18,
+    textAlign: "center",
+    color: "gray",
+    marginTop: 20,
   },
   exerciseCard: {
     backgroundColor: "#f0f0f0",

@@ -62,12 +62,12 @@ export default function WorkoutPlanScreen() {
         const storedUserId = await AsyncStorage.getItem("user_id");
         if (storedUserId) {
           setUserId(parseInt(storedUserId, 10));
-          console.log("✅ Loaded User ID:", storedUserId);
+          console.log(" Loaded User ID:", storedUserId);
         } else {
-          console.log("❌ No user ID found in storage. Please re-login.");
+          console.log(" No user ID found in storage. Please re-login.");
         }
       } catch (error) {
-        console.error("❌ Error loading user ID:", error);
+        console.error(" Error loading user ID:", error);
       }
     };
     loadUserData();
@@ -91,49 +91,67 @@ export default function WorkoutPlanScreen() {
 
       if (data.workouts && Array.isArray(data.workouts)) {
         setExercises(data.workouts);
-        console.log("✅ Workouts Fetched:", data.workouts.length);
+        console.log(" Workouts Fetched:", data.workouts.length);
       } else {
         alert("No exercises found for this selection.");
         setExercises([]);
       }
     } catch (error) {
-      console.error("❌ Error fetching exercises:", error);
+      console.error(" Error fetching exercises:", error);
       alert("Failed to fetch exercises. Check your connection.");
     }
   };
 
   const logWorkout = async (exercise: Exercise) => {
     try {
-      console.log("Logging workout:", exercise);
+        console.log(" Logging workout:", exercise);
 
-      // ✅ Keep your existing logic unchanged
-      const loggedWorkouts = await AsyncStorage.getItem("logged_workouts");
-      const workouts = loggedWorkouts ? JSON.parse(loggedWorkouts) : [];
-      workouts.push({ ...exercise, logged_at: new Date().toISOString() });
-      await AsyncStorage.setItem("logged_workouts", JSON.stringify(workouts));
+        //  Step 1: Send workout log to the backend
+        const response = await fetch("http://192.168.0.229:8000/log-workout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                user_id: userId,  
+                workout_name: exercise.name,
+                muscle_group: exercise.target_muscle,
+                equipment: exercise.equipment,
+                logged_at: new Date().toISOString(),
+            }),
+        });
 
-      Alert.alert("Success", "Workout logged successfully!");
+        if (!response.ok) {
+            throw new Error("Failed to log workout in database");
+        }
 
-      console.log("✅ Workout saved in local storage!");
+        console.log(" Workout logged successfully in backend!");
 
-      // ✅ Step 2: Send streak update request to backend
-      const streakResponse = await fetch("http://192.168.0.229:8000/gamification/log-activity", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId, activity_type: "workout" }),
-      });
+        //  Step 2: Keep the existing local storage logging
+        const loggedWorkouts = await AsyncStorage.getItem("logged_workouts");
+        const workouts = loggedWorkouts ? JSON.parse(loggedWorkouts) : [];
+        workouts.push({ ...exercise, logged_at: new Date().toISOString() });
+        await AsyncStorage.setItem("logged_workouts", JSON.stringify(workouts));
 
-      if (!streakResponse.ok) {
-        console.error("❌ Failed to update workout streak.");
-      } else {
-        console.log("🔥 Workout streak updated successfully!");
-      }
+        Alert.alert("Success", "Workout logged successfully!");
+
+        //  Step 3: Send streak update request to backend
+        const streakResponse = await fetch("http://192.168.0.229:8000/gamification/log-activity", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: userId, activity_type: "workout" }),
+        });
+
+        if (!streakResponse.ok) {
+            console.error(" Failed to update workout streak.");
+        } else {
+            console.log(" Workout streak updated successfully!");
+        }
 
     } catch (error) {
-      console.error("❌ Error logging workout:", error);
-      Alert.alert("❌ Error", "Failed to log workout.");
+        console.error(" Error logging workout:", error);
+        Alert.alert(" Error", "Failed to log workout.");
     }
 };
+
 
 
   const headerHeight = scrollY.interpolate({
@@ -298,7 +316,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
-    zIndex: 1, // Ensure the header is above other elements
+    zIndex: 1, 
   },
   headerTopRow: {
     flexDirection: "row",
