@@ -21,21 +21,30 @@ This is the completed frontend of **Wellness**, a final-year mobile app that hel
 
 ## 📁 Folder Overview
 
-fitness-frontend/
-├── app/
-│ ├── ai-feedback/ # AI suggestion display
-│ ├── auth/ # Login/Register/Forgot Password
-│ ├── community/ # Community posts
-│ ├── gamification/ # Streaks & Achievements
-│ ├── home/ # Dashboard with AI feedback
-│ ├── meals/ # Meal planning & logging
-│ ├── profile/ # Profile screen
-│ ├── workouts/ # Workout planning & logging
-├── assets/ # Icons and images
-├── App.tsx # Root app component
+app/
+├── (tabs)/ # Tab navigation (Dashboard, Meal, Workout, etc.)
+│ ├── index.tsx # Dashboard screen
+│ ├── meal-planning.tsx # Meal suggestion & logging
+│ ├── workout-plan.tsx # Workout selection & logging
+│ ├── community.tsx # Community screen
+│ ├── Gamification.tsx # Achievements and streaks
+├── CreatePost.tsx # New post screen
+├── CommentSection.tsx # Comment UI
+├── PostItem.tsx # Post rendering
+├── logged-meals.tsx # View logged meals
+├── LoggedExercisesScreen.tsx
+├── SuggestionCard.tsx # AI suggestion display
+├── recipe.tsx # Full recipe view
+├── profile.tsx # User profile
+├── login.tsx
+├── register.tsx / 0 / 1 / 2 # Registration steps
+├── forget-password.tsx
+├── reset-password.tsx
+├── welcome.tsx # Intro screen
+
 
 ##  Notes
-This frontend connects to the Wellness+ backend built with FastAPI.
+This frontend connects to the Wellness backend built with FastAPI.
 
 All major features including AI suggestions and gamification were implemented.
 
