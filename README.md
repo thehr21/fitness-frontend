@@ -1,50 +1,62 @@
-# Welcome to your Expo app 👋
+# Wellness Frontend
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is the completed frontend of **Wellness**, a final-year mobile app that helps users build healthy habits through meal logging, workout tracking, achievements, and habit suggestions.
 
-## Get started
+## ✅ Key Features
 
-1. Install dependencies
+- 🍽️ Meal planning with suggestions from Spoonacular API
+- 🏋️ Workout selection by type (Home/Gym) and muscle group (via ExerciseDB)
+- 📈 Meal and workout logging for tracking consistency
+- 🧠 AI-powered habit suggestions shown on the dashboard
+- 🏆 Achievement badges and streak progress
+- 👥 Community feed with posts, likes, and comments
+- 👤 Profile management and picture uploads
 
-   ```bash
-   npm install
-   ```
+## 🛠️ Tech Stack
 
-2. Start the app
+- React Native with Expo
+- TypeScript
+- Spoonacular & ExerciseDB APIs
+- Connected to FastAPI backend
 
-   ```bash
-    npx expo start
-   ```
+## 📁 Folder Overview
 
-In the output, you'll find options to open the app in a
+app/
+├── (tabs)/ # Tab navigation (Dashboard, Meal, Workout, etc.)
+│ ├── index.tsx # Dashboard screen
+│ ├── meal-planning.tsx # Meal suggestion & logging
+│ ├── workout-plan.tsx # Workout selection & logging
+│ ├── community.tsx # Community screen
+│ ├── Gamification.tsx # Achievements and streaks
+├── CreatePost.tsx # New post screen
+├── CommentSection.tsx # Comment UI
+├── PostItem.tsx # Post rendering
+├── logged-meals.tsx # View logged meals
+├── LoggedExercisesScreen.tsx
+├── SuggestionCard.tsx # AI suggestion display
+├── recipe.tsx # Full recipe view
+├── profile.tsx # User profile
+├── login.tsx
+├── register.tsx / 0 / 1 / 2 # Registration steps
+├── forget-password.tsx
+├── reset-password.tsx
+├── welcome.tsx # Intro screen
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+##  Notes
+This frontend connects to the Wellness backend built with FastAPI.
 
-## Get a fresh project
+All major features including AI suggestions and gamification were implemented.
 
-When you're ready, run:
+This project was submitted as a final-year university project and is not intended for production use.
+
+
+## 🚀 How to Run the App
 
 ```bash
-npm run reset-project
-```
+# Install dependencies
+npm install
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+# Start the Expo development server
+npx expo start
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
